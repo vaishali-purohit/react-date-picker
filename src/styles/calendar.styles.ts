@@ -38,8 +38,9 @@ export const DatePickerInput = styled.input`
   letter-spacing: 1px;
   background: transparent !important;
   display: flex;
+  cursor: pointer;
   align-items: center;
-  ::placeholder {
+  &::placeholder {
     color: #999;
     font-size: 0.9rem;
   }
@@ -48,6 +49,13 @@ export const DatePickerInput = styled.input`
 
   &:focus-visible {
     outline: none;
+  }
+
+  &:hover {
+    color: green;
+    &::placeholder {
+      color: green;
+    }
   }
 `;
 
@@ -181,6 +189,7 @@ export const CalendarDay = styled(CalendarCell)`
 export const CalendarDate = styled(CalendarCell)<{
   inMonth: boolean;
   isSelected: boolean;
+  isWeekend: boolean;
 }>`
   font-weight: ${(props) => (props.inMonth ? 500 : 300)};
   font-size: 4em;
@@ -192,7 +201,9 @@ export const CalendarDate = styled(CalendarCell)<{
   color: ${(props) => (props.inMonth && !props.disabled ? `#333` : `#ddd`)};
   grid-row: ${(props) => Math.floor(props.index / 7) + 2} / span 1;
   background: ${(props) =>
-    props.isSelected ? 'rgba(0, 102, 204, 0.075)' : 'inherit'};
+    props.isSelected && !props.isWeekend
+      ? 'rgba(0, 102, 204, 0.075)'
+      : 'inherit'};
   transition: all 0.4s ease-out;
 `;
 
@@ -247,5 +258,42 @@ export const RangeButton = styled.div`
     border: white solid #06c;
     color: white !important;
     background: #06c;
+  }
+`;
+
+export const YearPickerContainer = styled.div`
+  padding: 10px;
+`;
+
+export const YearNavigator = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+`;
+
+export const YearButton = styled.button`
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+`;
+
+export const YearGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+`;
+
+export const Year = styled.div<{ selected?: boolean }>`
+  padding: 5px;
+  cursor: pointer;
+  background-color: ${({ selected }) => (selected ? '#007BFF' : 'transparent')};
+  color: ${({ selected }) => (selected ? '#FFF' : '#000')};
+  text-align: center;
+  border-radius: 3px;
+
+  &:hover {
+    background-color: #007bff;
+    color: #fff;
   }
 `;

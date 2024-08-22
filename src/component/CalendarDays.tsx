@@ -26,10 +26,11 @@ type DateState = {
 interface CalendarDaysProps {
   dateState: DateState;
   setDateState: (date: DateState) => void;
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate?: Date | null;
+  endDate?: Date | null;
   onSelectDate: (date: Date) => void;
-  shouldDisableDate?: (date: Date) => boolean; // Function to disable certain dates
+  isDateRange: boolean;
+  isHidePastValue: boolean;
 }
 
 const CalendarDays: React.FC<CalendarDaysProps> = ({
@@ -38,7 +39,8 @@ const CalendarDays: React.FC<CalendarDaysProps> = ({
   startDate,
   endDate,
   onSelectDate,
-  shouldDisableDate,
+  isDateRange,
+  isHidePastValue,
 }) => {
   const today = new Date();
 
@@ -71,12 +73,63 @@ const CalendarDays: React.FC<CalendarDaysProps> = ({
     }
   };
 
-  const renderCalendarDate = (date: (string | number)[], index: number) => {
+  // Render a calendar date as returned from the calendar builder function
+  const renderCalendarDate = (date: any[], index: any) => {
+    const { current, month, year } = dateState;
+    const _date = new Date(date.join('-'));
+    // Check if calendar date is same day as today
+    const isToday = isSameDay(_date, today);
+    // Check if calendar date is same day as currently selected date
+    const isCurrent = current && isSameDay(_date, current);
+    // Check if calendar date is in the same month as the state month and year
+    const inMonth =
+      month && year && isSameMonth(_date, new Date([year, month, 1].join('-')));
+    const isDisabled = isHidePastValue && _date < new Date();
+    // The click handler
+    const onClick = gotoDate(_date);
+    const props = {
+      index,
+      inMonth,
+      onClick,
+      isDisabled,
+      title: _date.toDateString(),
+    };
+    // Conditionally render a styled date component
+    const DateComponent = isCurrent
+      ? Styled.HighlightedCalendarDate
+      : isToday
+        ? Styled.TodayCalendarDate
+        : Styled.CalendarDate;
+
+    return (
+      <DateComponent key={getDateISO(_date)} {...props}>
+        {_date.getDate()}
+      </DateComponent>
+    );
+  };
+
+  // Utility function to combine multiple date rules
+  const combine = (...rules: ((date: Date) => boolean)[]) => {
+    return (date: Date) => {
+      return rules.some((rule) => rule(date));
+    };
+  };
+
+  // Utility function to disable dates before today
+  const beforeToday = () => {
+    return (date: Date) => date < new Date();
+  };
+
+  const renderCalendarDateForRange = (
+    date: (string | number)[],
+    index: number,
+  ) => {
     const { current, month, year } = dateState;
     const _date = new Date(date.join('-'));
 
-    const isDisabled = shouldDisableDate
-      ? shouldDisableDate(_date) || !isWeekday(_date)
+    const shouldHide = combine(beforeToday());
+    const isDisabled = isHidePastValue
+      ? shouldHide(_date) || !isWeekday(_date)
       : !isWeekday(_date);
 
     // Check if a given date is within the selected date range.
@@ -99,6 +152,7 @@ const CalendarDays: React.FC<CalendarDaysProps> = ({
       inMonth,
       isDisabled,
       isSelected,
+      isWeekend,
       onClick,
       title: _date.toDateString(),
     };
@@ -142,22 +196,26 @@ const CalendarDays: React.FC<CalendarDaysProps> = ({
     const prevMonthDays = getMonthDays(prevMonth, prevMonthYear);
     // Builds dates to be displayed from previous month
 
-    const prevMonthDates = [...new Array(daysFromPrevMonth)].map((n, index) => {
-      const day = index + 1 + (prevMonthDays - daysFromPrevMonth);
-      return [prevMonthYear, zeroPad(prevMonth, 2), zeroPad(day, 2)];
-    });
+    const prevMonthDates = [...new Array(daysFromPrevMonth)].map(
+      (_n, index) => {
+        const day = index + 1 + (prevMonthDays - daysFromPrevMonth);
+        return [prevMonthYear, zeroPad(prevMonth, 2), zeroPad(day, 2)];
+      },
+    );
     // Builds dates to be displayed from current month
 
-    const thisMonthDates = [...new Array(monthDays)].map((n, index) => {
+    const thisMonthDates = [...new Array(monthDays)].map((_n, index) => {
       const day = index + 1;
       return [year, zeroPad(month, 2), zeroPad(day, 2)];
     });
     // Builds dates to be displayed from next month
 
-    const nextMonthDates = [...new Array(daysFromNextMonth)].map((n, index) => {
-      const day = index + 1;
-      return [nextMonthYear, zeroPad(nextMonth, 2), zeroPad(day, 2)];
-    });
+    const nextMonthDates = [...new Array(daysFromNextMonth)].map(
+      (_n, index) => {
+        const day = index + 1;
+        return [nextMonthYear, zeroPad(nextMonth, 2), zeroPad(day, 2)];
+      },
+    );
     // Combines all dates from previous, current and next months
     return [...prevMonthDates, ...thisMonthDates, ...nextMonthDates];
   };
@@ -172,7 +230,13 @@ const CalendarDays: React.FC<CalendarDaysProps> = ({
   return (
     <Styled.CalendarGrid>
       <Fragment>{Object.keys(WEEK_DAYS).map(renderDayLabel)}</Fragment>
-      <Fragment>{getCalendarDates().map(renderCalendarDate)}</Fragment>
+      {isDateRange ? (
+        <Fragment>
+          {getCalendarDates().map(renderCalendarDateForRange)}
+        </Fragment>
+      ) : (
+        <Fragment>{getCalendarDates().map(renderCalendarDate)}</Fragment>
+      )}
     </Styled.CalendarGrid>
   );
 };

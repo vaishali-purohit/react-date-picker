@@ -6,12 +6,14 @@ interface MonthNavigatorProps {
   currentYear: number;
   currentMonth: number;
   onMonthChange: (direction: boolean) => void;
+  onYearChange: () => void;
 }
 
 const MonthNavigator: React.FC<MonthNavigatorProps> = ({
   currentYear,
   currentMonth,
   onMonthChange,
+  onYearChange,
 }) => {
   // Resolve the month name from the CALENDAR_MONTHS object map
   const currentMonthName =
@@ -23,7 +25,7 @@ const MonthNavigator: React.FC<MonthNavigatorProps> = ({
         onClick={() => onMonthChange(false)}
         title="Previous Month"
       />
-      <Styled.CalendarMonth>
+      <Styled.CalendarMonth onClick={onYearChange}>
         {currentMonthName} {currentYear}
       </Styled.CalendarMonth>
       <Styled.ArrowRight

@@ -39,10 +39,7 @@ export const isDate = (date: Date) => {
 };
 
 // (bool) Checks if two date values are of the same month and year
-export const isSameMonth = (
-  date: { getMonth: () => string | number; getFullYear: () => any },
-  basedate = new Date(),
-) => {
+export const isSameMonth = (date: Date, basedate = new Date()) => {
   if (!(isDate(date) && isDate(basedate))) return false;
   const basedateMonth = +basedate.getMonth() + 1;
   const basedateYear = basedate.getFullYear();
@@ -52,14 +49,7 @@ export const isSameMonth = (
 };
 
 // (bool) Checks if two date values are the same day
-export const isSameDay = (
-  date: {
-    getDate: () => any;
-    getMonth: () => string | number;
-    getFullYear: () => any;
-  },
-  basedate = new Date(),
-) => {
+export const isSameDay = (date: Date, basedate = new Date()) => {
   if (!(isDate(date) && isDate(basedate))) return false;
   const basedateDate = basedate.getDate();
   const basedateMonth = +basedate.getMonth() + 1;
