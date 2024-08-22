@@ -5,7 +5,7 @@ import { formatDate } from '../utils/dateFormat';
 import { getPreviousWeekday } from '../utils/dateUtil';
 import BirthDayDatePicker from './BirthDayDatePicker';
 
-interface DatePickerProps {
+export interface DatePickerProps {
   endDate?: Date;
   startDate?: Date;
   weekendList?: Array<string>;

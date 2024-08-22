@@ -8,17 +8,12 @@ const App: React.FC = () => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [weekendList, setWeekendList] = useState<string[]>([]);
-  // const [birthDay, setBirthDay] = useState<Date | undefined>(undefined);
 
   const onChange = (start: Date, end: Date, weekendList: Array<string>) => {
     setStartDate(start);
     setEndDate(end);
     setWeekendList(weekendList);
   };
-
-  // const onChangeBirthDate = (birthday: Date) => {
-  //   setBirthDay(birthday);
-  // };
 
   return (
     <StyleSheetManager shouldForwardProp={isPropValid}>
@@ -35,13 +30,6 @@ const App: React.FC = () => {
           onChange={onChange}
           isHidePastValue={true}
         />
-        {/* For single birthdate selection */}
-        {/* <DatePicker
-          label="Enter BirhDay"
-          placeholderValue="YYYY / MM / DD"
-          onChange={onChangeBirthDate}
-          birthDate={birthDay}
-        /> */}
       </div>
     </StyleSheetManager>
   );

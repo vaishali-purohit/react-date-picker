@@ -4,7 +4,7 @@ import * as Styled from '../styles/calendar.styles';
 import DayPicker from './DayPicker';
 import YearPicker from './YearPicker';
 
-interface WeekdayDateRangePickerProps {
+export interface WeekdayDateRangePickerProps {
   predefinedRanges?: { label: string; range: DateRange }[];
   onChange: (range: DateRange, weekends: WeekendDates) => void;
   startDateRange: Date | null;
